@@ -33,9 +33,8 @@ function get(obj, path) {
 }
 
 export const mergeUpdators = (...rest) => state =>
-  rest.reduce((combinedUpdator, currentUpdator) =>
-    combinedUpdator.then(
-      newState => currentUpdator(newState),
+  rest.reduce((newStatePromise, currentUpdator) =>
+      newStatePromise.then(currentUpdator),
       Promise.resolve(state)
     )
   );
