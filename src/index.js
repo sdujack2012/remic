@@ -2,7 +2,7 @@ export { createStore } from "./store";
 export { StoreProvider, connectToStore } from "./StoreProvider";
 export {
   mergeUpdators,
-  UpdateInSequence,
+  updateInSequence,
   createCustomPartialUpdator,
   createPartialUpdator
 } from "./utils";
