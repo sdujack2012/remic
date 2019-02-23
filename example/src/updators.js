@@ -1,4 +1,4 @@
-import { createPartialUpdator, UpdateInSequence } from 'react-state-store';
+import { createPartialUpdator, updateInSequence } from 'react-state-store';
 
 const updateTodos = createPartialUpdator('toDos');
 const updateLoadingStatus = createPartialUpdator('loadingStatus');
@@ -41,7 +41,7 @@ export const updateIsLoadingToDos = updateLoadingStatus(
   }),
 );
 
-export const startRetrievingToDos = () => UpdateInSequence(
+export const startRetrievingToDos = () => updateInSequence(
   updateIsLoadingToDos(true),
   retrieveToDos(),
   updateIsLoadingToDos(false),
