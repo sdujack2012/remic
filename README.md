@@ -209,12 +209,12 @@ const setLearningReactAndReduxAtOnce = (isLearningReact, isLearningRedux) =>
   );
 ```
 
-# UpdateInSequence example
+# updateInSequence example
 
-UpdateInSequence triggers updators in the order of argument list. Async updators will be awaited before next one.
+updateInSequence triggers updators in the order of argument list. Async updators will be awaited before next one.
 
 ```jsx
-import { UpdateInSequence } from "react-state-store";
+import { updateInSequence } from "react-state-store";
 
 // create updator
 const setLearningReact = isLearningReact => state => ({
@@ -227,7 +227,7 @@ const setLearningRedux = isLearningRedux => state => ({
 });
 
 const setLearningReactThenRedux = (isLearningReact, isLearningRedux) =>
-  UpdateInSequence(
+  updateInSequence(
     setLearningReact(isLearningReact),
     setLearningRedux(isLearningRedux)
   );
