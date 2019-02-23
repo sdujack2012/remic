@@ -39,7 +39,7 @@ export const mergeUpdators = (...rest) => state =>
     )
   );
 
-export const UpdateInSequence = (...rest) => rest;
+export const updateInSequence = (...rest) => rest;
 
 export const createCustomPartialUpdator = (reader, writer) => updator => (
   ...rest
