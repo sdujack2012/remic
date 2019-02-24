@@ -33,20 +33,32 @@ function get(obj, path) {
 }
 
 export const mergeUpdators = (...rest) => state =>
-  rest.reduce((newStatePromise, currentUpdator) =>
-      newStatePromise.then(currentUpdator),
-      Promise.resolve(state)
-    )
+  rest.reduce(
+    (newStatePromise, currentUpdator) => newStatePromise.then(currentUpdator),
+    Promise.resolve(state)
   );
 
 export const updateInSequence = (...rest) => rest;
 
-export const createCustomPartialUpdator = (reader, writer) => updator => (
-  ...rest
-) => async state => {
-  const partialState = reader(state);
-  const newPartialState = await updator(...rest)(partialState);
-  return writer(state, newPartialState);
+export const createCustomPartialUpdator = (reader, writer) => (...updators) => {
+  const createPartialUpdator = updator => (...rest) => async state => {
+    const partialState = reader(state);
+    const newPartialState = await updator(...rest)(partialState);
+    return writer(state, newPartialState);
+  };
+
+  if (typeof updators[0] === "function") {
+    const partialUpdators = updators.map(createPartialUpdator);
+    return partialUpdators.length > 1 ? partialUpdators : partialUpdators[0];
+  } else if (typeof updators[0] === "object" && updators[0] !== null) {
+    return Object.keys(updators[0]).reduce(
+      (partialUpdators, updatorKey) => ({
+        ...partialUpdators,
+        [updatorKey]: createPartialUpdator(updators[0][updatorKey])
+      }),
+      {}
+    );
+  }
 };
 
 export const createPartialUpdator = path =>

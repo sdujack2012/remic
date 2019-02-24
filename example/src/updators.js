@@ -3,7 +3,7 @@ import { createPartialUpdator, updateInSequence } from 'react-state-store';
 const updateTodos = createPartialUpdator('toDos');
 const updateLoadingStatus = createPartialUpdator('loadingStatus');
 
-export const retrieveToDos = updateTodos(() => () => new Promise(resolve => {
+export const retrieveToDos = () => () => new Promise(resolve => {
   setTimeout(
     () => resolve({
       1: { description: 'todo1', isFinished: false, key: 1 },
@@ -13,26 +13,26 @@ export const retrieveToDos = updateTodos(() => () => new Promise(resolve => {
     }),
     2000,
   );
-}));
+});
 
-export const removeToDo = updateTodos(key => toDosState => {
+export const removeToDo = key => toDosState => {
   const newToDosState = { ...toDosState };
   delete newToDosState[key];
 
   return newToDosState;
-});
+};
 
-export const addToDo = updateTodos(newToDo => toDosState => ({
+export const addToDo = newToDo => toDosState => ({
   ...toDosState,
   [newToDo.key]: newToDo,
-}));
+});
 
-export const toggleToDo = updateTodos((key, isFinished) => toDosState => {
+export const toggleToDo = (key, isFinished) => toDosState => {
   const newToDosState = { ...toDosState };
   newToDosState[key] = { ...newToDosState[key], isFinished };
 
   return newToDosState;
-});
+};
 
 export const updateIsLoadingToDos = updateLoadingStatus(
   isLoadingToDos => loadingStatusState => ({
@@ -41,8 +41,15 @@ export const updateIsLoadingToDos = updateLoadingStatus(
   }),
 );
 
+export const toDoUpdators = updateTodos({
+  removeToDo,
+  addToDo,
+  toggleToDo,
+  retrieveToDos,
+});
+
 export const startRetrievingToDos = () => updateInSequence(
   updateIsLoadingToDos(true),
-  retrieveToDos(),
+  toDoUpdators.retrieveToDos(),
   updateIsLoadingToDos(false),
 );
