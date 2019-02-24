@@ -1,6 +1,6 @@
 {
-  "name": "react-state-store-example",
-  "homepage": "https://.github.io/react-state-store",
+  "name": "view-state-store-example",
+  "homepage": "https://.github.io/view-state-store",
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
@@ -9,7 +9,7 @@
     "react": "^16.7.0",
     "react-dom": "^16.4.1",
     "react-loader-spinner": "^2.3.0",
-    "react-state-store": "file:.."
+    "view-state-store": "file:.."
   },
   "scripts": {
     "start": "react-scripts start",

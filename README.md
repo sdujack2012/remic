@@ -1,15 +1,15 @@
-# react-state-store
+# view-state-store
 
-React-state-store is a simple and light weight react state management library without too much boilerplate. Redux is great and it enforces unified data flow. But as projects get big you will find your project flooded with actions, reducers and a lot constants. Also since redux doesn't natively support async actions, you have to install third party librarys as middleware. It adds a lot to development and maintanence efforts. React-state-store is designed to tackle these issues. It has some similar concepts, such as store and selectors. It also supports state separation. However, the most significant difference between them is that react-state-store replaces reducers and actions with updators that natively support acsync api call. Updators are higher order functions that take state as argument and return a new state, which replaces the current state. You can also return a promise that resoves to a new state. That is how it deals with async api calls
+view-state-store is a simple and light weight react state management library without too much boilerplate. Redux is great and it enforces unified data flow. But as projects get big you will find your project flooded with actions, reducers and a lot constants. Also since redux doesn't natively support async actions, you have to install third party librarys as middleware. It adds a lot to development and maintanence efforts. view-state-store is designed to tackle these issues. It has some similar concepts, such as store and selectors. It also supports state separation. However, the most significant difference between them is that view-state-store replaces reducers and actions with updators that natively support acsync api call. Updators are higher order functions that take state as argument and return a new state, which replaces the current state. You can also return a promise that resoves to a new state. That is how it deals with async api calls
 
 >
 
-[![NPM](https://img.shields.io/npm/v/react-state-store.svg)](https://www.npmjs.com/package/react-state-store) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![NPM](https://img.shields.io/npm/v/view-state-store.svg)](https://www.npmjs.com/package/view-state-store) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Install
 
 ```bash
-npm i --save @sdujack2012/react-state-store
+npm i --save @sdujack2012/view-state-store
 ```
 
 ## Usage
@@ -19,7 +19,7 @@ npm i --save @sdujack2012/react-state-store
 ```jsx
 import React from "react";
 
-import { createStore, StoreProvider, connectToStore } from "react-state-store";
+import { createStore, StoreProvider, connectToStore } from "view-state-store";
 
 // create selector
 const selectText = state => state.text;
@@ -62,7 +62,7 @@ export const App = () => (
 ```jsx
 import React from "react";
 
-import { createStore, StoreProvider, connectToStore } from "react-state-store";
+import { createStore, StoreProvider, connectToStore } from "view-state-store";
 
 // create selector
 const selectTodos = state => state.todos;
@@ -126,7 +126,7 @@ import {
   StoreProvider,
   connectToStore,
   createPartialUpdator
-} from "react-state-store";
+} from "view-state-store";
 // create selector
 const selectTodos = state => state.data.todos;
 
@@ -190,7 +190,7 @@ mergeUpdators merges existing updators into one that only triggers rerender once
 # mergeUpdators example
 
 ```jsx
-import { combineUpdators } from "react-state-store";
+import { combineUpdators } from "view-state-store";
 
 // create updator
 const setLearningReact = isLearningReact => state => ({
@@ -214,7 +214,7 @@ const setLearningReactAndReduxAtOnce = (isLearningReact, isLearningRedux) =>
 updateInSequence triggers updators in the order of argument list. Async updators will be awaited before next one.
 
 ```jsx
-import { updateInSequence } from "react-state-store";
+import { updateInSequence } from "view-state-store";
 
 // create updator
 const setLearningReact = isLearningReact => state => ({

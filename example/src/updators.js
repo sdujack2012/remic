@@ -1,4 +1,4 @@
-import { createPartialUpdator, updateInSequence } from 'react-state-store';
+import { createPartialUpdator, updateInSequence } from 'view-state-store';
 
 const updateTodos = createPartialUpdator('toDos');
 const updateLoadingStatus = createPartialUpdator('loadingStatus');

@@ -1,14 +1,14 @@
 {
-  "name": "@sdujack2012/react-state-store",
-  "version": "1.0.13",
-  "description": "A simple and light weight react state management library without too much boilerplate",
+  "name": "view-state-store",
+  "version": "0.0.1",
+  "description": "A simple and light weight frontend state management library without too much boilerplate",
   "author": "Kai Jiang",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:sdujack2012/react-state-store.git"
+    "url": "git@github.com:sdujack2012/view-state-store.git"
   },
-  "homepage": "https://github.com/sdujack2012/react-state-store",
+  "homepage": "https://github.com/sdujack2012/view-state-store",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",

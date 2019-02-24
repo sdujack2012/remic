@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createStore, StoreProvider } from 'react-state-store';
+import { createStore, StoreProvider } from 'view-state-store';
 
 import { ToDos } from './ToDos';
 
