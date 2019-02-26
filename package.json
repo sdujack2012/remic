@@ -1,6 +1,6 @@
 {
   "name": "view-state-store",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "A simple and light weight frontend state management library without too much boilerplate",
   "author": "Kai Jiang",
   "license": "MIT",
@@ -17,7 +17,7 @@
     "redux",
     "react state management",
     "selector",
-    "updator"
+    "updater"
   ],
   "engines": {
     "node": ">=8",

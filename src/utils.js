@@ -32,37 +32,37 @@ function get(obj, path) {
   return current;
 }
 
-export const mergeUpdators = (...rest) => state =>
+export const mergeUpdaters = (...rest) => state =>
   rest.reduce(
-    (newStatePromise, currentUpdator) => newStatePromise.then(currentUpdator),
+    (newStatePromise, currentUpdater) => newStatePromise.then(currentUpdater),
     Promise.resolve(state)
   );
 
 export const updateInSequence = (...rest) => rest;
 
-export const createCustomPartialUpdator = (reader, writer) => (...updators) => {
-  const createPartialUpdator = updator => (...rest) => async state => {
+export const createCustomPartialUpdater = (reader, writer) => (...updaters) => {
+  const createPartialUpdater = updater => (...rest) => async state => {
     const partialState = reader(state);
-    const newPartialState = await updator(...rest)(partialState);
+    const newPartialState = await updater(...rest)(partialState);
     return writer(state, newPartialState);
   };
 
-  if (typeof updators[0] === "function") {
-    const partialUpdators = updators.map(createPartialUpdator);
-    return partialUpdators.length > 1 ? partialUpdators : partialUpdators[0];
-  } else if (typeof updators[0] === "object" && updators[0] !== null) {
-    return Object.keys(updators[0]).reduce(
-      (partialUpdators, updatorKey) => ({
-        ...partialUpdators,
-        [updatorKey]: createPartialUpdator(updators[0][updatorKey])
+  if (typeof updaters[0] === "function") {
+    const partialUpdaters = updaters.map(createPartialUpdater);
+    return partialUpdaters.length > 1 ? partialUpdaters : partialUpdaters[0];
+  } else if (typeof updaters[0] === "object" && updaters[0] !== null) {
+    return Object.keys(updaters[0]).reduce(
+      (partialUpdaters, updaterKey) => ({
+        ...partialUpdaters,
+        [updaterKey]: createPartialUpdater(updaters[0][updaterKey])
       }),
       {}
     );
   }
 };
 
-export const createPartialUpdator = path =>
-  createCustomPartialUpdator(
+export const createPartialUpdater = path =>
+  createCustomPartialUpdater(
     state => get(state, path),
     (state, newPartialState) => set(state, path, newPartialState)
   );
@@ -72,26 +72,29 @@ export const wait = time => new Promise(resolve => setTimeout(resolve, time));
 export function throttle(callback, delay) {
   let isThrottled = false,
     args,
-    context;
+    promise;
 
-  function wrapper() {
+  return () => {
     if (isThrottled) {
       args = arguments;
-      context = this;
-      return;
+      if (!promise) {
+        promise = Promise.resolve(
+          new Promise(resolve => {
+            setTimeout(() => {
+              isThrottled = false;
+              promise = null;
+              if (args) {
+                resolve(callback(...args));
+                args = null;
+              }
+            }, delay);
+          })
+        );
+      }
+      return promise;
     }
 
     isThrottled = true;
-    callback.apply(this, arguments);
-
-    setTimeout(() => {
-      isThrottled = false;
-      if (args) {
-        wrapper.apply(context, args);
-        args = context = null;
-      }
-    }, delay);
-  }
-
-  return wrapper;
+    return Promise.resolve(callback(...arguments));
+  };
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { createStore } from "./store";
 import { wait, throttle } from "./utils";
+import { DEFAULT_RERENDER_INTERVAL } from "./constants";
 const StoreContext = React.createContext();
 
 export class StoreProvider extends React.Component {
@@ -11,7 +12,7 @@ export class StoreProvider extends React.Component {
   };
 
   static defaultProps = {
-    rerenderInterval: 16
+    rerenderInterval: DEFAULT_RERENDER_INTERVAL
   };
 
   constructor(props) {
@@ -19,9 +20,14 @@ export class StoreProvider extends React.Component {
     this.state = { ts: Date.now() };
 
     const throttledSetState = throttle(() => {
-      this.renderPromise = new Promise(resolve => {
-        this.setState({ ts: Date.now() }, resolve);
-      }).then(() => wait(props.rerenderInterval));
+      const awaiter = wait(props.rerenderInterval);
+      this.renderPromise = Promise.all([
+        new Promise(resolve => {
+          this.setState({ ts: Date.now() }, resolve);
+        }),
+        awaiter
+      ]);
+      return this.renderPromise;
     }, props.rerenderInterval);
 
     this.unSubscribeFromStore = this.props.store.subscribe(() =>
@@ -51,20 +57,20 @@ export class StoreProvider extends React.Component {
   }
 }
 
-export const connectToStore = (selectors, updators) => Component =>
+export const connectToStore = (selectors, updaters) => Component =>
   class ConnectedComponent extends React.Component {
     static contextType = StoreContext;
 
-    getUpdatorsAndProps = () => {
+    getUpdatersAndProps = () => {
       const { store, getRenderPromise } = this.context;
-      this.updators =
-        this.updators ||
-        Object.keys(updators || {}).reduce((result, current) => {
+      this.updaters =
+        this.updaters ||
+        Object.keys(updaters || {}).reduce((result, current) => {
           return {
             ...result,
             [current]: async (...reset) => {
-              const newState = await store.update(updators[current](...reset));
-              await getRenderPromise();
+              const newState = await store.update(updaters[current](...reset));
+              await getRenderPromise(); //await rerender cycle to finish
               return newState;
             }
           };
@@ -80,10 +86,10 @@ export const connectToStore = (selectors, updators) => Component =>
         {}
       );
 
-      return { ...this.updators, ...selectedProps };
+      return { ...this.updaters, ...selectedProps };
     };
 
     render() {
-      return <Component {...this.getUpdatorsAndProps()} {...this.props} />;
+      return <Component {...this.getUpdatersAndProps()} {...this.props} />;
     }
   };

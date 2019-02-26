@@ -2,11 +2,13 @@ function Store(initialState) {
   let subscribers = [];
   let state = initialState;
 
-  let updateOnce = async updator => {
+  let updateOnce = async updater => {
     const previousState = state;
-    const newState = await updator(previousState);
+    const newState = await updater(previousState);
     state = newState;
-    subscribers.forEach(subscriber => subscriber(newState, previousState));
+    await Promise.all(
+      subscribers.map(subscriber => subscriber(newState, previousState))
+    );
     return newState;
   };
 
@@ -21,13 +23,13 @@ function Store(initialState) {
     return selector(state);
   };
 
-  this.update = async updators => {
-    if (Array.isArray(updators)) {
-      for (let i = 0; i < updators.length; i++) {
-        await updateOnce(updators[i]);
+  this.update = async updaters => {
+    if (Array.isArray(updaters)) {
+      for (let i = 0; i < updaters.length; i++) {
+        await updateOnce(updaters[i]);
       }
     } else {
-      await updateOnce(updators);
+      await updateOnce(updaters);
     }
     return this.getState();
   };

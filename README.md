@@ -1,6 +1,6 @@
 # view-state-store
 
-view-state-store is a simple and light weight react state management library without too much boilerplate. Redux is great and it enforces unified data flow. But as projects get big you will find your project flooded with actions, reducers and a lot constants. Also since redux doesn't natively support async actions, you have to install third party librarys as middleware. It adds a lot to development and maintanence efforts. view-state-store is designed to tackle these issues. It has some similar concepts, such as store and selectors. It also supports state separation. However, the most significant difference between them is that view-state-store replaces reducers and actions with updators that natively support acsync api call. Updators are higher order functions that take state as argument and return a new state, which replaces the current state. You can also return a promise that resoves to a new state. That is how it deals with async api calls
+view-state-store is a simple and light weight react state management library without too much boilerplate. Redux is great and it enforces unified data flow. But as projects get big you will find your project flooded with actions, reducers and a lot constants. Also since redux doesn't natively support async actions, you have to install third party librarys as middleware. It adds a lot to development and maintanence efforts. view-state-store is designed to tackle these issues. It has some similar concepts, such as store and selectors. It also supports state separation. However, the most significant difference between them is that view-state-store replaces reducers and actions with updaters that natively support acsync api call. Updaters are higher order functions that take state as argument and return a new state, which replaces the current state. You can also return a promise that resoves to a new state. That is how it deals with async api calls
 
 >
 
@@ -28,10 +28,10 @@ const selectors = {
   text: selectText
 };
 
-// create updator
+// create updater
 const updateText = text => state => ({ ...state, text });
 
-const updators = { updateText };
+const updaters = { updateText };
 
 // create store with initial state
 const store = createStore({ text: "" });
@@ -48,7 +48,7 @@ export class Title extends React.Component {
   }
 }
 
-export const ConntectedTitle = connectToStore(selectors, updators)(Title);
+export const ConntectedTitle = connectToStore(selectors, updaters)(Title);
 
 export const App = () => (
   <StoreProvider store={store}>
@@ -71,7 +71,7 @@ const selectors = {
   todos: selectTodos
 };
 
-// create updator
+// create updater
 const retrieveTodos = () => state =>
   new Promise(resolve => {
     // mimicing api call
@@ -86,7 +86,7 @@ const retrieveTodos = () => state =>
     }, 2000);
   });
 
-const updators = { retrieveTodos };
+const updaters = { retrieveTodos };
 
 // create store with initial state
 const store = createStore({ text: "" });
@@ -107,7 +107,7 @@ export class Todos extends React.Component {
   }
 }
 
-export const ConntectedTodos = connectToStore(selectors, updators)(Todos);
+export const ConntectedTodos = connectToStore(selectors, updaters)(Todos);
 
 export const App = () => (
   <StoreProvider store={store}>
@@ -125,7 +125,7 @@ import {
   createStore,
   StoreProvider,
   connectToStore,
-  createPartialUpdator
+  createPartialUpdater
 } from "view-state-store";
 // create selector
 const selectTodos = state => state.data.todos;
@@ -134,9 +134,9 @@ const selectors = {
   todos: selectTodos
 };
 
-// create updator
-// createPartialUpdator takes the path of the state as argument and returns a function. Pass updators in this function to create updators that only change part point by the path. Note path can be more than one level. Separate each level by "."
-const updateTodos = createPartialUpdator("data.todos");
+// create updater
+// createPartialUpdater takes the path of the state as argument and returns a function. Pass updaters in this function to create updaters that only change part point by the path. Note path can be more than one level. Separate each level by "."
+const updateTodos = createPartialUpdater("data.todos");
 const retrieveTodos = updateTodos(() => () =>
   new Promise(resolve => {
     // mimicing api call
@@ -149,7 +149,7 @@ const retrieveTodos = updateTodos(() => () =>
   })
 );
 
-const updators = { retrieveTodos };
+const updaters = { retrieveTodos };
 
 // create store with initial state
 const store = createStore({ data: { todos: [] } });
@@ -170,7 +170,7 @@ export class Todos extends React.Component {
   }
 }
 
-export const ConntectedTodos = connectToStore(selectors, updators)(Todos);
+export const ConntectedTodos = connectToStore(selectors, updaters)(Todos);
 
 export const App = () => (
   <StoreProvider store={store}>
@@ -179,20 +179,20 @@ export const App = () => (
 );
 ```
 
-# compose existing updator
+# compose existing updater
 
-There are two functions that combine updators in two different ways.
+There are two functions that combine updaters in two different ways.
 
-# mergeUpdators
+# mergeUpdaters
 
-mergeUpdators merges existing updators into one that only triggers rerender once. It helps when you want to make multiple changes to the state at the same time
+mergeUpdaters merges existing updaters into one that only triggers rerender once. It helps when you want to make multiple changes to the state at the same time
 
-# mergeUpdators example
+# mergeUpdaters example
 
 ```jsx
-import { combineUpdators } from "view-state-store";
+import { combineUpdaters } from "view-state-store";
 
-// create updator
+// create updater
 const setLearningReact = isLearningReact => state => ({
   ...state,
   isLearningReact
@@ -203,7 +203,7 @@ const setLearningRedux = isLearningRedux => state => ({
 });
 
 const setLearningReactAndReduxAtOnce = (isLearningReact, isLearningRedux) =>
-  combineUpdators(
+  combineUpdaters(
     setLearningReact(isLearningReact),
     setLearningRedux(isLearningRedux)
   );
@@ -211,12 +211,12 @@ const setLearningReactAndReduxAtOnce = (isLearningReact, isLearningRedux) =>
 
 # updateInSequence example
 
-updateInSequence triggers updators in the order of argument list. Async updators will be awaited before next one.
+updateInSequence triggers updaters in the order of argument list. Async updaters will be awaited before next one.
 
 ```jsx
 import { updateInSequence } from "view-state-store";
 
-// create updator
+// create updater
 const setLearningReact = isLearningReact => state => ({
   ...state,
   isLearningReact

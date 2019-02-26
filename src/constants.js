@@ -1,0 +1,1 @@
+export const DEFAULT_RERENDER_INTERVAL = 16;

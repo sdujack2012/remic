@@ -1,8 +1,8 @@
 export { createStore } from "./store";
 export { StoreProvider, connectToStore } from "./StoreProvider";
 export {
-  mergeUpdators,
+  mergeUpdaters,
   updateInSequence,
-  createCustomPartialUpdator,
-  createPartialUpdator
+  createCustomPartialUpdater,
+  createPartialUpdater
 } from "./utils";

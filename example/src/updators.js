@@ -1,7 +1,7 @@
-import { createPartialUpdator, updateInSequence } from 'view-state-store';
+import { createPartialUpdater, updateInSequence } from 'view-state-store';
 
-const updateTodos = createPartialUpdator('toDos');
-const updateLoadingStatus = createPartialUpdator('loadingStatus');
+const updateTodos = createPartialUpdater('toDos');
+const updateLoadingStatus = createPartialUpdater('loadingStatus');
 
 export const retrieveToDos = () => () => new Promise(resolve => {
   setTimeout(
@@ -41,7 +41,7 @@ export const updateIsLoadingToDos = updateLoadingStatus(
   }),
 );
 
-export const toDoUpdators = updateTodos({
+export const toDoUpdaters = updateTodos({
   removeToDo,
   addToDo,
   toggleToDo,
@@ -50,6 +50,6 @@ export const toDoUpdators = updateTodos({
 
 export const startRetrievingToDos = () => updateInSequence(
   updateIsLoadingToDos(true),
-  toDoUpdators.retrieveToDos(),
+  toDoUpdaters.retrieveToDos(),
   updateIsLoadingToDos(false),
 );

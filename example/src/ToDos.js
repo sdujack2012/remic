@@ -5,11 +5,7 @@ import Loader from 'react-loader-spinner';
 import { connectToStore } from 'view-state-store';
 
 import { selectTodos, selectIsLoadingToDos } from './selectors';
-import {
-  startRetrievingToDos,
-  toDoUpdators,
-  updateIsLoadingToDos,
-} from './updators';
+import { startRetrievingToDos, toDoUpdaters } from './updaters';
 
 export class ToDosComponent extends Component {
   state = { todoDescription: '' };
@@ -112,14 +108,12 @@ ToDosComponent.propTypes = {
   removeToDo: PropTypes.func.isRequired,
   toggleToDo: PropTypes.func.isRequired,
   startRetrievingToDos: PropTypes.func.isRequired,
-  updateIsLoadingToDos: PropTypes.func.isRequired,
 };
 
 export const ToDos = connectToStore(
   { toDos: selectTodos, isLoadingToDos: selectIsLoadingToDos },
   {
-    ...toDoUpdators,
-    updateIsLoadingToDos,
+    ...toDoUpdaters,
     startRetrievingToDos,
   },
 )(ToDosComponent);
