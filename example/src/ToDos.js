@@ -5,7 +5,11 @@ import Loader from 'react-loader-spinner';
 import { connectToStore } from 'view-state-store';
 
 import { selectTodos, selectIsLoadingToDos } from './selectors';
-import { startRetrievingToDos, toDoUpdators } from './updators';
+import {
+  startRetrievingToDos,
+  toDoUpdators,
+  updateIsLoadingToDos,
+} from './updators';
 
 export class ToDosComponent extends Component {
   state = { todoDescription: '' };
@@ -50,8 +54,7 @@ export class ToDosComponent extends Component {
                         className="form-check-input"
                         type="checkbox"
                         checked={toDo.isFinished}
-                        onChange={isFinished => toggleToDo(toDo.key, isFinished)
-                        }
+                        onChange={() => toggleToDo(toDo.key, !toDo.isFinished)}
                       />
                       <label
                         htmlFor="defaultCheck1"
@@ -109,12 +112,14 @@ ToDosComponent.propTypes = {
   removeToDo: PropTypes.func.isRequired,
   toggleToDo: PropTypes.func.isRequired,
   startRetrievingToDos: PropTypes.func.isRequired,
+  updateIsLoadingToDos: PropTypes.func.isRequired,
 };
 
 export const ToDos = connectToStore(
   { toDos: selectTodos, isLoadingToDos: selectIsLoadingToDos },
   {
     ...toDoUpdators,
+    updateIsLoadingToDos,
     startRetrievingToDos,
   },
 )(ToDosComponent);

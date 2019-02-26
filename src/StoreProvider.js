@@ -1,19 +1,35 @@
 import React from "react";
 import { createStore } from "./store";
+import { wait, throttle } from "./utils";
 const StoreContext = React.createContext();
 
 export class StoreProvider extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
-    store: PropTypes.instanceOf(createStore).isRequired
+    store: PropTypes.instanceOf(createStore).isRequired,
+    rerenderInterval: PropTypes.number
   };
+
+  static defaultProps = {
+    rerenderInterval: 16
+  };
+
   constructor(props) {
     super(props);
     this.state = { ts: Date.now() };
+
+    const throttledSetState = throttle(() => {
+      this.renderPromise = new Promise(resolve => {
+        this.setState({ ts: Date.now() }, resolve);
+      }).then(() => wait(props.rerenderInterval));
+    }, props.rerenderInterval);
+
     this.unSubscribeFromStore = this.props.store.subscribe(() =>
-      this.setState({ ts: Date.now() })
+      throttledSetState()
     );
   }
+
+  getRenderPromise = () => this.renderPromise;
 
   componentWillUnmount() {
     this.unSubscribeFromStore();
@@ -22,7 +38,12 @@ export class StoreProvider extends React.Component {
   render() {
     return (
       <StoreContext.Provider
-        value={{ store: this.props.store, ts: this.state.ts }}
+        value={{
+          store: this.props.store,
+          rerenderInterval: this.props.rerenderInterval,
+          getRenderPromise: this.getRenderPromise,
+          ts: this.state.ts
+        }}
       >
         {React.Children.only(this.props.children)}
       </StoreContext.Provider>
@@ -30,41 +51,39 @@ export class StoreProvider extends React.Component {
   }
 }
 
-export const connectToStore = (
-  connectPropsToStore,
-  connectUpdatorsToStore
-) => Component =>
+export const connectToStore = (selectors, updators) => Component =>
   class ConnectedComponent extends React.Component {
     static contextType = StoreContext;
 
-    getPropsAndUpdators = () => {
-      const { store, ts } = this.context;
-      console.log(ts);
-      const calculatedProps = Object.keys(connectPropsToStore || {}).reduce(
+    getUpdatorsAndProps = () => {
+      const { store, getRenderPromise } = this.context;
+      this.updators =
+        this.updators ||
+        Object.keys(updators || {}).reduce((result, current) => {
+          return {
+            ...result,
+            [current]: async (...reset) => {
+              const newState = await store.update(updators[current](...reset));
+              await getRenderPromise();
+              return newState;
+            }
+          };
+        }, {});
+
+      const selectedProps = Object.keys(selectors || {}).reduce(
         (result, current) => {
           return {
             ...result,
-            [current]: connectPropsToStore[current](store.getState())
+            [current]: selectors[current](store.getState())
           };
         },
         {}
       );
 
-      const updators = Object.keys(connectUpdatorsToStore || {}).reduce(
-        (result, current) => {
-          return {
-            ...result,
-            [current]: (...reset) =>
-              store.update(connectUpdatorsToStore[current](...reset))
-          };
-        },
-        {}
-      );
-
-      return { ...calculatedProps, ...updators };
+      return { ...this.updators, ...selectedProps };
     };
 
     render() {
-      return <Component {...this.getPropsAndUpdators()} {...this.props} />;
+      return <Component {...this.getUpdatorsAndProps()} {...this.props} />;
     }
   };

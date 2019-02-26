@@ -9,7 +9,7 @@ view-state-store is a simple and light weight react state management library wit
 ## Install
 
 ```bash
-npm i --save @sdujack2012/view-state-store
+npm i --save view-state-store
 ```
 
 ## Usage
