@@ -1,6 +1,6 @@
 {
-  "short_name": "view-state-store",
-  "name": "view-state-store",
+  "short_name": "remic",
+  "name": "remic",
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#000000",

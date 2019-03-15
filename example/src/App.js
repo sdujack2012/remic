@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createStore, StoreProvider } from 'view-state-store';
+import { createStore, StoreProvider } from 'remic';
 
 import { ToDos } from './ToDos';
 

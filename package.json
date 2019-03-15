@@ -1,14 +1,14 @@
 {
-  "name": "view-state-store",
-  "version": "0.0.4",
+  "name": "remic",
+  "version": "0.0.1",
   "description": "A simple and light weight frontend state management library without too much boilerplate",
   "author": "Kai Jiang",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git@github.com:sdujack2012/view-state-store.git"
+    "url": "git@github.com:sdujack2012/remic.git"
   },
-  "homepage": "https://github.com/sdujack2012/view-state-store",
+  "homepage": "https://github.com/sdujack2012/remic",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",

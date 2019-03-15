@@ -1,4 +1,4 @@
-import { createPartialUpdater, updateInSequence } from 'view-state-store';
+import { createPartialUpdater, updateInSequence } from 'remic';
 
 const updateTodos = createPartialUpdater('toDos');
 const updateLoadingStatus = createPartialUpdater('loadingStatus');

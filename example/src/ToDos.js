@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Loader from 'react-loader-spinner';
 
-import { connectToStore } from 'view-state-store';
+import { connectToStore } from 'remic';
 
 import { selectTodos, selectIsLoadingToDos } from './selectors';
 import { startRetrievingToDos, toDoUpdaters } from './updaters';

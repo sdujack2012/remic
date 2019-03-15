@@ -1,6 +1,6 @@
 import React from "react";
 import { createStore } from "./store";
-import { wait, throttle } from "./utils";
+import { wait } from "./utils";
 import { DEFAULT_RERENDER_INTERVAL } from "./constants";
 const StoreContext = React.createContext();
 
@@ -18,24 +18,29 @@ export class StoreProvider extends React.Component {
   constructor(props) {
     super(props);
     this.state = { ts: Date.now() };
+    this.isRendering = false;
+    const createRenderCyclePromise = () =>
+      wait(props.rerenderInterval)
+        .then(() => {
+          if (this.isRendering) {
+            this.isRendering = false;
+            return new Promise(resolve => {
+              this.setState({ ts: Date.now() }, resolve);
+            });
+          }
+        })
+        .then(() => {
+          this.renderCyclePromise = createRenderCyclePromise();
+        });
 
-    const throttledSetState = throttle(() => {
-      const awaiter = wait(props.rerenderInterval);
-      this.renderPromise = Promise.all([
-        new Promise(resolve => {
-          this.setState({ ts: Date.now() }, resolve);
-        }),
-        awaiter
-      ]);
-      return this.renderPromise;
-    }, props.rerenderInterval);
+    this.renderCyclePromise = createRenderCyclePromise();
 
-    this.unSubscribeFromStore = this.props.store.subscribe(() =>
-      throttledSetState()
-    );
+    this.unSubscribeFromStore = this.props.store.subscribe(() => {
+      this.isRendering = true;
+    });
   }
 
-  getRenderPromise = () => this.renderPromise;
+  getCurrentRenderCyclePromise = () => this.renderCyclePromise;
 
   componentWillUnmount() {
     this.unSubscribeFromStore();
@@ -46,8 +51,7 @@ export class StoreProvider extends React.Component {
       <StoreContext.Provider
         value={{
           store: this.props.store,
-          rerenderInterval: this.props.rerenderInterval,
-          getRenderPromise: this.getRenderPromise,
+          getCurrentRenderCyclePromise: this.getCurrentRenderCyclePromise,
           ts: this.state.ts
         }}
       >
@@ -62,7 +66,7 @@ export const connectToStore = (selectors, updaters) => Component =>
     static contextType = StoreContext;
 
     getUpdatersAndProps = () => {
-      const { store, getRenderPromise } = this.context;
+      const { store, getCurrentRenderCyclePromise } = this.context;
       this.updaters =
         this.updaters ||
         Object.keys(updaters || {}).reduce((result, current) => {
@@ -70,7 +74,7 @@ export const connectToStore = (selectors, updaters) => Component =>
             ...result,
             [current]: async (...reset) => {
               const newState = await store.update(updaters[current](...reset));
-              await getRenderPromise(); //await rerender cycle to finish
+              await getCurrentRenderCyclePromise();
               return newState;
             }
           };

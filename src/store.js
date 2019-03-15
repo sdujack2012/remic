@@ -6,9 +6,7 @@ function Store(initialState) {
     const previousState = state;
     const newState = await updater(previousState);
     state = newState;
-    await Promise.all(
-      subscribers.map(subscriber => subscriber(newState, previousState))
-    );
+    subscribers.forEach(subscriber => subscriber(newState, previousState));
     return newState;
   };
 

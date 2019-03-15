@@ -68,33 +68,3 @@ export const createPartialUpdater = path =>
   );
 
 export const wait = time => new Promise(resolve => setTimeout(resolve, time));
-
-export function throttle(callback, delay) {
-  let isThrottled = false,
-    args,
-    promise;
-
-  return () => {
-    if (isThrottled) {
-      args = arguments;
-      if (!promise) {
-        promise = Promise.resolve(
-          new Promise(resolve => {
-            setTimeout(() => {
-              isThrottled = false;
-              promise = null;
-              if (args) {
-                resolve(callback(...args));
-                args = null;
-              }
-            }, delay);
-          })
-        );
-      }
-      return promise;
-    }
-
-    isThrottled = true;
-    return Promise.resolve(callback(...arguments));
-  };
-}
