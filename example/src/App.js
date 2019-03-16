@@ -2,7 +2,7 @@ import React from 'react';
 
 import { createStore, StoreProvider } from 'remic';
 
-import { ToDos } from './ToDos';
+import { ToDosWithHooks } from './ToDosWithHooks';
 
 const store = createStore({
   toDos: {},
@@ -11,6 +11,6 @@ const store = createStore({
 window.store = store;
 export const App = () => (
   <StoreProvider store={store}>
-    <ToDos />
+    <ToDosWithHooks />
   </StoreProvider>
 );
