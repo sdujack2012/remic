@@ -6,3 +6,4 @@ export {
   createCustomPartialUpdater,
   createPartialUpdater
 } from "./utils";
+export { useRemic } from "./hooks";

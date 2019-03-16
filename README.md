@@ -1,6 +1,6 @@
 # remic
 
-remic is a simple and light weight react state management library without too much boilerplate. Redux is great and it enforces unified data flow. But as projects get big you will find your project flooded with actions, reducers and a lot constants. Also since redux doesn't natively support async actions, you have to install third party librarys as middleware. It adds a lot to development and maintanence efforts. remic is designed to tackle these issues. It has some similar concepts, such as store and selectors. It also supports state separation. However, the most significant difference between them is that remic replaces reducers and actions with updaters that natively support acsync api call. Updaters are higher order functions that take state as argument and return a new state, which replaces the current state. You can also return a promise that resoves to a new state. That is how it deals with async api calls
+remic is a simple and light weight react state management library without too much boilerplate. Redux is great and it enforces unified data flow. But as projects get big you will find your project flooded with actions, reducers and constants. Also since redux doesn't natively support async actions, you have to install third party middleware. It adds a lot to development and maintanence efforts. remic is designed to tackle these issues. It has some similar concepts, such as store and selectors. It also supports react hooks. However, the most significant difference between them is that remic replaces reducers and actions with updaters that natively support acsync api call. Updaters are higher order functions that take state as argument and return a new state, which replaces the current state. You can also return a promise that resoves to a new state. That is how it deals with async api calls.
 
 >
 
@@ -59,6 +59,10 @@ export const App = () => (
 
 # Deal with api calls example
 
+Remic natively supports async api calls. Once connected with store, updaters will return a promise that only resolves
+when the async api call or the current render cycle is finished, whichever finishes later. The default render interval is
+16ms. Rerender doesn't happen right after updater are excuted instead it is deferred until the end of each render cycle.
+
 ```jsx
 import React from "react";
 
@@ -66,12 +70,16 @@ import { createStore, StoreProvider, connectToStore } from "remic";
 
 // create selector
 const selectTodos = state => state.todos;
+const selectIsLoading = state => state.isLoading;
 
 const selectors = {
+  isLoading: selectIsLoading,
   todos: selectTodos
 };
 
 // create updater
+const setIsLoading = isLoading => state => ({ ...state, isLoading });
+
 const retrieveTodos = () => state =>
   new Promise(resolve => {
     // mimicing api call
@@ -86,20 +94,25 @@ const retrieveTodos = () => state =>
     }, 2000);
   });
 
-const updaters = { retrieveTodos };
+const updaters = { retrieveTodos, setIsLoading };
 
 // create store with initial state
-const store = createStore({ text: "" });
+const store = createStore({ todos: [] });
 
 export class Todos extends React.Component {
-  componentDidMount() {
-    this.props.retrieveTodos();
+  async componentDidMount() {
+    const { retrieveTodos, setIsLoading } = this.props;
+    setIsLoading(true);
+    await retrieveTodos();
+    setIsLoading(false);
   }
 
   render() {
-    const { todos } = this.props;
+    const { todos, isLoading } = this.props;
 
-    return (
+    return isLoading ? (
+      <span>Loading</span>
+    ) : (
       <ul>
         {todos && todos.map(todo => <li key={todo.key}>{todo.description}</li>)}
       </ul>
@@ -112,6 +125,77 @@ export const ConntectedTodos = connectToStore(selectors, updaters)(Todos);
 export const App = () => (
   <StoreProvider store={store}>
     <ConntectedTodos />
+  </StoreProvider>
+);
+```
+
+# Used with react hook
+
+```jsx
+import React, { useEffect } from "react";
+
+import { createStore, StoreProvider, useRemic } from "remic";
+
+// create selector
+const selectTodos = state => state.todos;
+const selectIsLoading = state => state.isLoading;
+
+const selectors = {
+  isLoading: selectIsLoading,
+  todos: selectTodos
+};
+
+// create updater
+const setIsLoading = isLoading => state => ({ ...state, isLoading });
+const retrieveTodos = () => state =>
+  new Promise(resolve => {
+    // mimicing api call
+    setTimeout(() => {
+      resolve({
+        ...state,
+        todos: [
+          { description: "Learn react", key: 0 },
+          { description: "Learn redux", key: 1 }
+        ]
+      });
+    }, 2000);
+  });
+
+const updaters = { retrieveTodos, setIsLoading };
+
+// create store with initial state
+const store = createStore({ todos: [] });
+
+export const Todos = () => {
+  const [{ todos, isLoading }, { retrieveTodos, setIsLoading }] = useRemic(
+    selectors,
+    updaters
+  );
+
+  useEffect(async () => {
+    setIsLoading(true);
+    await retrieveTodos();
+    setIsLoading(false);
+  }, []); //so that it only gets called on first render
+
+  return (
+    <div>
+      {" "}
+      {isLoading ? (
+        <span>Loading</span>
+      ) : (
+        <ul>
+          {todos &&
+            todos.map(todo => <li key={todo.key}>{todo.description}</li>)}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+export const App = () => (
+  <StoreProvider store={store}>
+    <Todos />
   </StoreProvider>
 );
 ```

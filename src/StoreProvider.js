@@ -2,7 +2,7 @@ import React from "react";
 import { createStore } from "./store";
 import { wait } from "./utils";
 import { DEFAULT_RERENDER_INTERVAL } from "./constants";
-const StoreContext = React.createContext();
+export const StoreContext = React.createContext();
 
 export class StoreProvider extends React.Component {
   static propTypes = {

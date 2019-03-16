@@ -19,7 +19,6 @@ export const ToDosWithHooks = () => {
       addToDo, removeToDo, toggleToDo, startRetrievingToDos,
     },
   ] = useRemic(selectors, updaters);
-
   const [todoDescription, setTodoDescription] = useState('');
 
   useEffect(() => {
@@ -71,7 +70,7 @@ export const ToDosWithHooks = () => {
                 type="text"
                 className="form-control"
                 value={todoDescription}
-                onChange={() => setTodoDescription(todoDescription)}
+                onChange={event => setTodoDescription(event.target.value)}
                 placeholder="Enter todo"
               />
             </div>

@@ -1,6 +1,6 @@
 {
   "name": "remic",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "A simple and light weight frontend state management library without too much boilerplate",
   "author": "Kai Jiang",
   "license": "MIT",
@@ -14,6 +14,7 @@
   "jsnext:main": "dist/index.es.js",
   "keywords": [
     "react",
+    "react hooks",
     "redux",
     "react state management",
     "selector",
